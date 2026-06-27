@@ -1,0 +1,118 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<div class="mb-4">
+    <h1 class="h3">Vehicle Number Plate Recognition</h1>
+    <p class="text-muted mb-1">User: <strong>@ViewBag.DisplayName</strong> | Role: <strong>@ViewBag.Role</strong></p>
+    <p class="text-muted">Test accounts: <code>admin/admin123</code>, <code>police/police123</code></p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <a class="card test-card text-decoration-none" asp-controller="Auth" asp-action="Index">
+            <div class="card-body">
+                <span class="badge text-bg-primary mb-2">Function 1</span>
+                <h2 class="h5">Login Police/Admin</h2>
+                <p class="text-muted mb-0">@Model.PoliceCount test users</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="card test-card text-decoration-none" asp-controller="Scan" asp-action="Index">
+            <div class="card-body">
+                <span class="badge text-bg-warning mb-2">Function 2</span>
+                <h2 class="h5">Scan plate</h2>
+                <p class="text-muted mb-0">External OCR System</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="card test-card text-decoration-none" asp-controller="Check" asp-action="Index">
+            <div class="card-body">
+                <span class="badge text-bg-success mb-2">Function 3</span>
+                <h2 class="h5">Check list</h2>
+                <p class="text-muted mb-0">@Model.VehicleCount blacklist/whitelist records</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a class="card test-card text-decoration-none" asp-controller="Notifications" asp-action="Index">
+            <div class="card-body">
+                <span class="badge text-bg-danger mb-2">Function 4</span>
+                <h2 class="h5">Notify / DB</h2>
+                <p class="text-muted mb-0">@Model.NotificationCount notifications saved</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header fw-semibold">Recent scan database</div>
+            <div class="card-body">
+                @if (Model.RecentScans.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Plate</th>
+                                    <th>Status</th>
+                                    <th>Location</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model.RecentScans)
+                                {
+                                    <tr>
+                                        <td>@PlateNumberFormatter.Display(log.PlateNumber)</td>
+                                        <td>@log.ListStatus</td>
+                                        <td>@log.Location</td>
+                                        <td>@log.ScannedAt.ToString("HH:mm dd/MM")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No scan data yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header fw-semibold">Recent notifications database</div>
+            <div class="card-body">
+                @if (Model.RecentNotifications.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var notification in Model.RecentNotifications)
+                        {
+                            <div class="list-group-item px-0">
+                                <strong>@PlateNumberFormatter.Display(notification.PlateNumber)</strong>
+                                <span class="text-muted">at @notification.Location</span>
+                                <div class="small text-muted">@notification.ExternalDeliveryId</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No notification data yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

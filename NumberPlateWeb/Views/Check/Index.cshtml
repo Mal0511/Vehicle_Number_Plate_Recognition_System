@@ -1,0 +1,77 @@
+@model CheckIndexViewModel
+@{
+    ViewData["Title"] = "Check List";
+}
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header fw-semibold">3. Check Blacklist / Whitelist</div>
+            <div class="card-body">
+                <form asp-action="Run" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.PlateNumber" class="form-label"></label>
+                        <input asp-for="Input.PlateNumber" class="form-control" placeholder="51A-12345" />
+                        <span asp-validation-for="Input.PlateNumber" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Check</button>
+                </form>
+
+                @if (Model.Result is not null)
+                {
+                    <hr />
+                    <div class="result-box @(Model.Result.Status == "Blacklist" ? "result-danger" : "result-ok")">
+                        <div class="small text-muted">Result</div>
+                        <h2 class="h4">@PlateNumberFormatter.Display(Model.Result.PlateNumber) - @Model.Result.Status</h2>
+                        @if (Model.Result.Found)
+                        {
+                            <p class="mb-1">Owner: @Model.Result.OwnerName</p>
+                            <p class="mb-1">Color: @Model.Result.Color</p>
+                            <p class="mb-0">Reason: @Model.Result.Reason</p>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header fw-semibold">Database mẫu</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Plate</th>
+                                <th>Type</th>
+                                <th>Owner</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SeedData)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@PlateNumberFormatter.Display(item.RegisteredNumber)</td>
+                                    <td>
+                                        <span class="badge @(item.Type == VehicleListType.Blacklist ? "text-bg-danger" : "text-bg-success")">
+                                            @item.Type.ToDisplayName()
+                                        </span>
+                                    </td>
+                                    <td>@item.OwnerName</td>
+                                    <td>@item.Reason</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

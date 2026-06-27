@@ -1,0 +1,100 @@
+﻿@using NumberPlateWeb.Modules.PoliceManagement.ViewModels
+@using NumberPlateWeb.Modules.PoliceManagement.Models
+@model PoliceIndexViewModel
+@{
+    ViewData["Title"] = "Quan ly Canh sat";
+}
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header fw-semibold">Them canh sat moi</div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.FullName" class="form-label">Ho ten</label>
+                        <input asp-for="Input.FullName" class="form-control" placeholder="Nguyen Van A" />
+                        <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.BadgeNumber" class="form-label">Ma canh sat</label>
+                        <input asp-for="Input.BadgeNumber" class="form-control" placeholder="CS001" />
+                        <span asp-validation-for="Input.BadgeNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.UnitName" class="form-label">Don vi</label>
+                        <input asp-for="Input.UnitName" class="form-control" placeholder="Doi CSGT Q1" />
+                        <span asp-validation-for="Input.UnitName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.PhoneNumber" class="form-label">So dien thoai</label>
+                        <input asp-for="Input.PhoneNumber" class="form-control" placeholder="0901234567" />
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Username" class="form-label">Ten dang nhap</label>
+                        <input asp-for="Input.Username" class="form-control" placeholder="officer01" />
+                        <span asp-validation-for="Input.Username" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary w-100" type="submit">Them</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header fw-semibold">Danh sach canh sat (@Model.Officers.Count nguoi)</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Ho ten</th>
+                                <th>Ma</th>
+                                <th>Don vi</th>
+                                <th>Dien thoai</th>
+                                <th>Trang thai</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var officer in Model.Officers)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@officer.FullName</td>
+                                    <td>@officer.BadgeNumber</td>
+                                    <td>@officer.UnitName</td>
+                                    <td>@officer.PhoneNumber</td>
+                                    <td>
+                                        <span class="badge @(officer.IsActive ? "text-bg-success" : "text-bg-secondary")">
+                                            @(officer.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form asp-action="ToggleActive" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@officer.Id" />
+                                            <button class="btn btn-sm btn-outline-secondary" type="submit">
+                                                @(officer.IsActive ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

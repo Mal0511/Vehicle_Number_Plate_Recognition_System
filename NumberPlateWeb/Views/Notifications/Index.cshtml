@@ -1,0 +1,74 @@
+@model NotificationsIndexViewModel
+@{
+    ViewData["Title"] = "Notify / DB";
+}
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header fw-semibold">4. Notify khi xe blacklist</div>
+            <div class="card-body">
+                <form asp-action="Send" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.PlateNumber" class="form-label"></label>
+                        <input asp-for="Input.PlateNumber" class="form-control" placeholder="51A-12345" />
+                        <span asp-validation-for="Input.PlateNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Location" class="form-label"></label>
+                        <input asp-for="Input.Location" class="form-control" placeholder="Gate A" />
+                        <span asp-validation-for="Input.Location" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Message" class="form-label"></label>
+                        <textarea asp-for="Input.Message" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Input.Message" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Send notification</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header fw-semibold">Notification database</div>
+            <div class="card-body">
+                @if (Model.Notifications.Any())
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var item in Model.Notifications)
+                        {
+                            <div class="list-group-item px-0">
+                                <div class="d-flex justify-content-between gap-3">
+                                    <strong>@PlateNumberFormatter.Display(item.PlateNumber)</strong>
+                                    <span class="badge @(item.SentSuccessfully ? "text-bg-success" : "text-bg-danger")">
+                                        @(item.SentSuccessfully ? "Sent" : "Failed")
+                                    </span>
+                                </div>
+                                <div>@item.Message</div>
+                                <div class="small text-muted">
+                                    @item.Location | @item.ExternalProvider | @item.ExternalDeliveryId
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No notification saved yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

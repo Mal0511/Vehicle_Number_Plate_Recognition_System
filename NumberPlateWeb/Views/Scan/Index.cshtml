@@ -1,0 +1,91 @@
+@model ScanIndexViewModel
+@{
+    ViewData["Title"] = "Scan";
+}
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header fw-semibold">2. Scan biển số bằng Android</div>
+            <div class="card-body">
+                <form asp-action="Run" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.CameraFrameReference" class="form-label"></label>
+                        <input asp-for="Input.CameraFrameReference" class="form-control" placeholder="51A-12345" />
+                        <span asp-validation-for="Input.CameraFrameReference" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.OfficerName" class="form-label"></label>
+                        <input asp-for="Input.OfficerName" class="form-control" placeholder="Police Officer" />
+                        <span asp-validation-for="Input.OfficerName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Location" class="form-label"></label>
+                        <input asp-for="Input.Location" class="form-control" placeholder="Gate A" />
+                        <span asp-validation-for="Input.Location" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Scan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">External system result</div>
+            <div class="card-body">
+                @if (Model.Result is not null)
+                {
+                    <div class="result-box @(Model.Result.ListStatus == "Blacklist" ? "result-danger" : "result-ok")">
+                        <div class="small text-muted">Plate recognized by @Model.Result.RecognitionProvider</div>
+                        <h2>@PlateNumberFormatter.Display(Model.Result.PlateNumber)</h2>
+                        <p class="mb-1">OCR confidence: @Model.Result.Confidence.ToString("P0")</p>
+                        <p class="mb-1">Location provider: @Model.Result.LocationProvider</p>
+                        <p class="mb-1">List status: @Model.Result.ListStatus</p>
+                        <p class="mb-0">Notify/DB: @Model.Result.AlertStatus</p>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No scan yet.</p>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold">Scan database</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Plate</th>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Notify</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model.Logs)
+                            {
+                                <tr>
+                                    <td>@PlateNumberFormatter.Display(log.PlateNumber)</td>
+                                    <td>@log.ListStatus</td>
+                                    <td>@log.Location</td>
+                                    <td>@(log.NotificationSent ? "Saved + Sent" : "Saved")</td>
+                                    <td>@log.ScannedAt.ToString("HH:mm:ss")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

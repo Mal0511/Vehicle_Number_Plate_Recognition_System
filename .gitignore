@@ -1,0 +1,5 @@
+NumberPlateWeb/bin/
+NumberPlateWeb/obj/
+NumberPlateWeb/server*.log
+NumberPlateWeb/App_Data/*.db-shm
+NumberPlateWeb/App_Data/*.db-wal

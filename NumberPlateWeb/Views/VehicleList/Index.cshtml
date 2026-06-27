@@ -1,0 +1,100 @@
+﻿@using NumberPlateWeb.Modules.VehicleLists.ViewModels
+@using NumberPlateWeb.Modules.VehicleLists.Models
+@model VehicleListIndexViewModel
+@{
+    ViewData["Title"] = "Danh sach xe";
+}
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header fw-semibold">Them xe vao danh sach</div>
+            <div class="card-body">
+                <form asp-action="Save" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.RegisteredNumber" class="form-label">Bien so</label>
+                        <input asp-for="Input.RegisteredNumber" class="form-control" placeholder="51A-12345" />
+                        <span asp-validation-for="Input.RegisteredNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Color" class="form-label">Mau xe</label>
+                        <input asp-for="Input.Color" class="form-control" placeholder="Den" />
+                        <span asp-validation-for="Input.Color" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.OwnerName" class="form-label">Chu xe</label>
+                        <input asp-for="Input.OwnerName" class="form-control" placeholder="Nguyen Van A" />
+                        <span asp-validation-for="Input.OwnerName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Type" class="form-label">Loai danh sach</label>
+                        <select asp-for="Input.Type" class="form-select">
+                            <option value="1">Blacklist</option>
+                            <option value="2">Whitelist</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Reason" class="form-label">Ly do</label>
+                        <input asp-for="Input.Reason" class="form-control" placeholder="Vi pham giao thong" />
+                        <span asp-validation-for="Input.Reason" class="text-danger"></span>
+                    </div>
+                    <button class="btn btn-primary w-100" type="submit">Luu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header fw-semibold">Danh sach xe (@Model.Vehicles.Count ban ghi)</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Bien so</th>
+                                <th>Loai</th>
+                                <th>Mau</th>
+                                <th>Chu xe</th>
+                                <th>Ly do</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var vehicle in Model.Vehicles)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@PlateNumberFormatter.Display(vehicle.RegisteredNumber)</td>
+                                    <td>
+                                        <span class="badge @(vehicle.Type == VehicleListType.Blacklist ? "text-bg-danger" : "text-bg-success")">
+                                            @vehicle.Type.ToDisplayName()
+                                        </span>
+                                    </td>
+                                    <td>@vehicle.Color</td>
+                                    <td>@vehicle.OwnerName</td>
+                                    <td>@vehicle.Reason</td>
+                                    <td>
+                                        <form asp-action="Delete" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@vehicle.Id" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">Xoa</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
