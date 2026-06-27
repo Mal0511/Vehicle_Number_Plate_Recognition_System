@@ -8,6 +8,7 @@ public class ScanResultViewModel
     public decimal Confidence { get; set; }
     public string RecognitionProvider { get; set; } = string.Empty;
     public string LocationProvider { get; set; } = string.Empty;
+    public string RawOcrText { get; set; } = string.Empty;
     public string ListStatus { get; set; } = string.Empty;
     public string AlertStatus { get; set; } = string.Empty;
     public ScanLog? ScanLog { get; set; }

@@ -78,6 +78,31 @@ body {
   border-color: #fecdca;
 }
 
+.camera-box {
+  background: #111827;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.camera-video,
+.camera-preview {
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.raw-ocr {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 10px;
+  max-height: 180px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+}
+
 .table th {
   color: #64748b;
   font-size: 0.78rem;

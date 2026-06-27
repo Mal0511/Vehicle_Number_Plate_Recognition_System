@@ -4,15 +4,16 @@ namespace NumberPlateWeb.Modules.Scanning.ViewModels;
 
 public class ScanRequest
 {
-    [Required(ErrorMessage = "Nhập mã ảnh hoặc biển số mô phỏng")]
-    [Display(Name = "Dữ liệu camera")]
-    public string CameraFrameReference { get; set; } = string.Empty;
+    [Display(Name = "Manual plate fallback")]
+    public string? CameraFrameReference { get; set; }
 
-    [Required(ErrorMessage = "Nhập tên cảnh sát")]
-    [Display(Name = "Cảnh sát")]
+    public string? CapturedImageBase64 { get; set; }
+
+    [Required(ErrorMessage = "Enter police officer")]
+    [Display(Name = "Police officer")]
     public string OfficerName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Nhập vị trí quét")]
-    [Display(Name = "Vị trí")]
+    [Required(ErrorMessage = "Enter location")]
+    [Display(Name = "Location")]
     public string Location { get; set; } = string.Empty;
 }

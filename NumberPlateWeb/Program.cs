@@ -31,7 +31,18 @@ builder.Services.AddSingleton<IPoliceRepository, InMemoryPoliceRepository>();
 builder.Services.AddSingleton<IVehicleListRepository, SqliteVehicleListRepository>();
 builder.Services.AddSingleton<IScanLogRepository, SqliteScanLogRepository>();
 builder.Services.AddSingleton<INotificationRepository, SqliteNotificationRepository>();
-builder.Services.AddSingleton<IPlateRecognitionGateway, MockPlateRecognitionGateway>();
+var googleVisionCredentialPath = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+
+if (string.IsNullOrWhiteSpace(googleVisionCredentialPath))
+{
+    googleVisionCredentialPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "google-vision-key.json");
+}
+
+builder.Services.AddSingleton(new GoogleVisionOcrOptions
+{
+    CredentialPath = googleVisionCredentialPath
+});
+builder.Services.AddSingleton<IPlateRecognitionGateway, GoogleVisionPlateRecognitionGateway>();
 builder.Services.AddSingleton<IInternetLocationService, MockInternetLocationService>();
 builder.Services.AddSingleton<IAdminAlertGateway, MockAdminAlertGateway>();
 

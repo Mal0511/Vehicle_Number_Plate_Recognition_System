@@ -6,26 +6,49 @@
 <div class="row g-3">
     <div class="col-lg-5">
         <div class="card">
-            <div class="card-header fw-semibold">2. Scan biển số bằng Android</div>
+            <div class="card-header fw-semibold">2. Scan license plate with camera</div>
             <div class="card-body">
-                <form asp-action="Run" method="post">
+                <form asp-action="Run" method="post" id="scanForm">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="camera-box mb-3">
+                        <video id="cameraVideo" class="camera-video" autoplay playsinline muted></video>
+                        <canvas id="cameraCanvas" class="d-none"></canvas>
+                        <img id="photoPreview" class="camera-preview d-none" alt="Captured license plate preview" />
+                    </div>
+
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-outline-primary" type="button" id="startCameraButton">Start camera</button>
+                        <button class="btn btn-outline-secondary" type="button" id="captureButton">Capture photo</button>
+                    </div>
+
+                    <input name="CapturedImageBase64" value="@Model.Input.CapturedImageBase64" type="hidden" id="capturedImageInput" />
+
                     <div class="mb-3">
-                        <label asp-for="Input.CameraFrameReference" class="form-label"></label>
-                        <input asp-for="Input.CameraFrameReference" class="form-control" placeholder="51A-12345" />
-                        <span asp-validation-for="Input.CameraFrameReference" class="text-danger"></span>
+                        <label for="CameraFrameReference" class="form-label">Manual plate fallback</label>
+                        <input id="CameraFrameReference" name="CameraFrameReference" value="@Model.Input.CameraFrameReference" class="form-control" placeholder="51A-12345 if camera/OCR fails" />
+                        @if (ViewData.ModelState["CameraFrameReference"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["CameraFrameReference"]!.Errors[0].ErrorMessage</span>
+                        }
                     </div>
                     <div class="mb-3">
-                        <label asp-for="Input.OfficerName" class="form-label"></label>
-                        <input asp-for="Input.OfficerName" class="form-control" placeholder="Police Officer" />
-                        <span asp-validation-for="Input.OfficerName" class="text-danger"></span>
+                        <label for="OfficerName" class="form-label">Police officer</label>
+                        <input id="OfficerName" name="OfficerName" value="@Model.Input.OfficerName" class="form-control" placeholder="Police Officer" required />
+                        @if (ViewData.ModelState["OfficerName"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["OfficerName"]!.Errors[0].ErrorMessage</span>
+                        }
                     </div>
                     <div class="mb-3">
-                        <label asp-for="Input.Location" class="form-label"></label>
-                        <input asp-for="Input.Location" class="form-control" placeholder="Gate A" />
-                        <span asp-validation-for="Input.Location" class="text-danger"></span>
+                        <label for="Location" class="form-label">Location</label>
+                        <input id="Location" name="Location" value="@Model.Input.Location" class="form-control" placeholder="Gate A" required />
+                        @if (ViewData.ModelState["Location"]?.Errors.Count > 0)
+                        {
+                            <span class="text-danger">@ViewData.ModelState["Location"]!.Errors[0].ErrorMessage</span>
+                        }
                     </div>
-                    <button class="btn btn-primary" type="submit">Scan</button>
+                    <button class="btn btn-primary" type="submit">Send to Google OCR and scan</button>
                 </form>
             </div>
         </div>
@@ -45,6 +68,14 @@
                         <p class="mb-1">List status: @Model.Result.ListStatus</p>
                         <p class="mb-0">Notify/DB: @Model.Result.AlertStatus</p>
                     </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Result.RawOcrText))
+                    {
+                        <details class="mt-3">
+                            <summary>Raw OCR text / provider message</summary>
+                            <pre class="raw-ocr">@Model.Result.RawOcrText</pre>
+                        </details>
+                    }
                 }
                 else
                 {
@@ -88,4 +119,53 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const preview = document.getElementById('photoPreview');
+            const imageInput = document.getElementById('capturedImageInput');
+            const startButton = document.getElementById('startCameraButton');
+            const captureButton = document.getElementById('captureButton');
+            let stream = null;
+
+            startButton.addEventListener('click', async () => {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false
+                    });
+                    video.srcObject = stream;
+                    video.classList.remove('d-none');
+                    preview.classList.add('d-none');
+                } catch (error) {
+                    alert('Cannot open camera: ' + error.message);
+                }
+            });
+
+            captureButton.addEventListener('click', () => {
+                if (!video.videoWidth || !video.videoHeight) {
+                    alert('Start camera first, then capture.');
+                    return;
+                }
+
+                const targetWidth = 900;
+                const ratio = video.videoHeight / video.videoWidth;
+                canvas.width = targetWidth;
+                canvas.height = Math.round(targetWidth * ratio);
+
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                imageInput.value = dataUrl;
+                preview.src = dataUrl;
+                preview.classList.remove('d-none');
+            });
+        })();
+    </script>
 }

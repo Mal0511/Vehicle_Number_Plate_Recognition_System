@@ -2,5 +2,5 @@ namespace NumberPlateWeb.Modules.ExternalSystems.PlateRecognition;
 
 public interface IPlateRecognitionGateway
 {
-    Task<PlateRecognitionResult> RecognizeAsync(string cameraFrameReference);
+    Task<PlateRecognitionResult> RecognizeAsync(string cameraFrameReference, string? capturedImageBase64);
 }

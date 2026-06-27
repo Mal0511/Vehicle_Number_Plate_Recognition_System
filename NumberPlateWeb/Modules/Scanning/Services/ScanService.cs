@@ -40,7 +40,9 @@ public class ScanService
 
     public async Task<ScanResultViewModel> ScanAsync(ScanRequest request)
     {
-        var recognition = await _plateRecognitionGateway.RecognizeAsync(request.CameraFrameReference);
+        var recognition = await _plateRecognitionGateway.RecognizeAsync(
+            request.CameraFrameReference ?? string.Empty,
+            request.CapturedImageBase64);
         var location = await _internetLocationService.ResolveLocationAsync(request.Location);
         var vehicle = _vehicleListService.FindByPlate(recognition.PlateNumber);
         var listStatus = vehicle is null ? "Not Found" : vehicle.Type.ToDisplayName();
@@ -74,6 +76,7 @@ public class ScanService
             Confidence = recognition.Confidence,
             RecognitionProvider = recognition.Provider,
             LocationProvider = location.Provider,
+            RawOcrText = recognition.RawPayload,
             ListStatus = listStatus,
             AlertStatus = alertStatus,
             ScanLog = log

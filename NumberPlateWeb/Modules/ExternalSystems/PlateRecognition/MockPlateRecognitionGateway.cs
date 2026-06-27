@@ -4,7 +4,7 @@ namespace NumberPlateWeb.Modules.ExternalSystems.PlateRecognition;
 
 public class MockPlateRecognitionGateway : IPlateRecognitionGateway
 {
-    public async Task<PlateRecognitionResult> RecognizeAsync(string cameraFrameReference)
+    public async Task<PlateRecognitionResult> RecognizeAsync(string cameraFrameReference, string? capturedImageBase64)
     {
         await Task.Delay(180);
 

@@ -2,9 +2,10 @@
 
 ## External Systems
 
-1. External OCR System
+1. External OCR System - Google Cloud Vision OCR
    - Module adapter: `Modules/ExternalSystems/PlateRecognition`
-   - Responsibility: recognize plate characters and return a text/number string.
+   - Responsibility: receive the captured camera image, recognize plate characters, and return a text/number string.
+   - Local credential file: `App_Data/google-vision-key.json` (ignored by git).
 
 2. Internet / Location Service
    - Module adapter: `Modules/ExternalSystems/InternetLocation`
@@ -22,7 +23,7 @@
    - UI: `Views/Scan/Index.cshtml`
    - Controller: `Controllers/ScanController.cs`
    - Service: `Modules/Scanning/Services/ScanService.cs`
-   - External dependency: `IPlateRecognitionGateway`
+   - External dependency: `IPlateRecognitionGateway` implemented by `GoogleVisionPlateRecognitionGateway`
 
 3. Check plate in Blacklist/Whitelist
    - UI: `Views/Check/Index.cshtml`

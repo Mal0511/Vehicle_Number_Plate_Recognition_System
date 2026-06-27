@@ -20,8 +20,14 @@ public class ScanController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Run([Bind(Prefix = "Input")] ScanRequest input)
+    public async Task<IActionResult> Run(ScanRequest input)
     {
+        if (string.IsNullOrWhiteSpace(input.CameraFrameReference)
+            && string.IsNullOrWhiteSpace(input.CapturedImageBase64))
+        {
+            ModelState.AddModelError(nameof(input.CameraFrameReference), "Capture a camera image or enter a manual plate.");
+        }
+
         if (!ModelState.IsValid)
         {
             return View("Index", BuildViewModel(input));
